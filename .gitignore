@@ -1,0 +1,8 @@
+# Ignorar archivos temporales de editor
+*.swp
+.vscode/
+
+# Ignorar archivos compilados
+build/
+*.class
+*.o
