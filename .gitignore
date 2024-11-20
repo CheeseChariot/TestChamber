@@ -4,5 +4,6 @@
 
 # Ignorar archivos compilados
 build/
+obj/
 *.class
 *.o
