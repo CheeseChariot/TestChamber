@@ -1,0 +1,52 @@
+Documentación para el manejo básico de archivos en C utilizando file_utils.h y file_utils.c.
+
+Autoría: Emmanuel Velásquez
+
+Sintesis de uso:
+-----------------------
+- Esta implementación ofrece herramientas para manejo de archivos de texto.
+- Permite abrir, leer, escribir, cerrar, comprobar el tamaño de un archivo y su existencia.
+- Hace uso de la estructura FileHandler para manejar de forma optima archivos sin comprometer el contenido.
+- Se puede debe definir una carpeta según su dirección relativa al ejecutable.
+
+Archivo file_utils.h:
+----------------------
+- Contiene las declaraciones de funciones para abrir, leer, escribir y cerrar archivos, y otras utilidades.
+
+Estructura y funciones:
+1. FileHandler:
+   - Estructura que contiene un puntero al archivo y un modo de apertura.
+2. OpenFile: 
+   - Abre el archivo en el modo especificado ("r", "w", etc.) y devuelve un puntero a FileHandler.
+3. CloseFile: 
+   - Cierra el archivo y libera memoria.
+4. GetFileSize: 
+   - Devuelve el tamaño del archivo en bytes.
+5. FileExists: 
+   - Comprueba si un archivo existe.
+6. FileTouch:
+   - Crea un archivo, o en caso de estar creado, modifica su marca de tiempo.
+7. ReadFile: 
+   - Lee datos del archivo en un buffer.
+8. WriteFile: 
+   - Escribe datos de un buffer en el archivo.
+
+Archivo file_utils.c:
+----------------------
+- Implementa las funciones definidas en file_utils.h.
+
+Ejemplo de uso:
+---------------
+```c
+#include "file_utils.h"
+
+int main() {
+    CharFixed path = "./test_space"
+    CharFixed filename = "test.txt";
+    FileHandler *file = OpenFile(path,filename, "w");
+    if (file == NULL) return 1;
+
+    WriteFile(file, "Contenido de ejemplo", 19);
+    CloseFile(file);
+}
+```
