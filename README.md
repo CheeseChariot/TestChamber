@@ -3,10 +3,8 @@ This one exist to try and do some good thing. Maybe for me, maybe for you, maybe
 
 This place is built on C.
 
-Check 'docs/' to see the documentation of the resource you need.
-
-**If there is none, then i haven't finished the thing.**
-
+Check 'docs/' to see the documentation of the resource you need.  
+**If there is none, then i haven't finished the thing.**  
 *Come back later for it. May exist later*
 
 1. easy_cody:
