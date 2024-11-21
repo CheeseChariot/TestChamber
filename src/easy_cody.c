@@ -1,5 +1,7 @@
 #include "easy_cody.h"
 
+bool DebugMode = false;
+
 void Msg(const char *format, ...) {
     va_list args;
     va_start(args, format);
@@ -18,8 +20,12 @@ void Failure(const char *format, ...) {
     abort();
 }
 
+bool DebugStatus(){
+    return DebugMode;
+}
+
 void Debug(const char *format, ...) {
-    if (DebugMode) {
+    if (DebugStatus()) {
         printf("DEBUG: ");
         va_list args;
         va_start(args, format);

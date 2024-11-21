@@ -5,12 +5,13 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include <string.h>
 
 #define Max(a, b) ((a > b) ? a : b)
 #define Min(a, b) ((a < b) ? a : b)
 #define Frac(a,b) ((Decimal)(a)/(Decimal)(b))
 #define Loop while(1)
-#define Repeat(n) for(Integer2 i=0; i<n; i++)
+#define Repeat(n) for(uint i=0; i<n; i++)
 
 //Tipos
 #define uint unsigned int
@@ -25,9 +26,9 @@
 #define FailEnd return -1;
 
 //Gestor de mensajes
-extern bool DebugMode = false;
 void Msg(const char *format, ...);
 void Failure(const char *format, ...);
+bool DebugStatus();
 void Debug(const char *format, ...);
 
-#endif // ARCHETYPE_FITS_H
+#endif // EASY_CODY_H
