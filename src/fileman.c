@@ -5,11 +5,14 @@
 FM OpenFile(str Dir, str Name, str Mode) {
     Debug("OpenFile: Intentando abrir archivo...");
     Debug("OpenFile: D-> %s | A-> %s | M-> %s", Dir, Name, Mode);
+
+    Debug ("Asignando memoria...");
     FM File = (FM) malloc(sizeof(struct FM));
     if (File == NULL) {
         Failure("OpenFile: Error al asignar memoria para el archivo.");
         return NULL;
     }
+    Debug ("Asignación hecha.");
 
     char FilePath[256];
     snprintf(FilePath, sizeof(FilePath), "%s/%s", Dir, Name);

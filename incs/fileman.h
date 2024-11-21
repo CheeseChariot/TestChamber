@@ -11,7 +11,7 @@ typedef struct FM* FM;
 // Estructura para manejar el archivo
 struct FM {
     FILE* FP;
-    str Path;
+    char Path[256];
     char Mode[4];  // Almacena el modo de apertura ("r", "w", "a", etc.)
 };
 
