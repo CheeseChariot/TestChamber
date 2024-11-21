@@ -3,6 +3,8 @@
 
 #include "easy_cody.h"
 #include <dirent.h>
+#include <unistd.h>
+
 
 typedef struct FM* FM;
 
@@ -35,6 +37,7 @@ void PrintFileContentWithWrap(FM File, size_t LineWidth);
 str CombinePath(str Dir, str Name);
 void FreeFileList(str* FileList, size_t Count);
 
-//Función de Ejemplo o Test.
+//Función de Ejemplo o Test
+void FilemanTest();
 
 #endif // FILEMAN_H

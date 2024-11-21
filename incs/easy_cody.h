@@ -6,6 +6,8 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <string.h>
+#include <errno.h>
+
 
 #define Max(a, b) ((a > b) ? a : b)
 #define Min(a, b) ((a < b) ? a : b)
