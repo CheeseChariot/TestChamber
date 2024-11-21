@@ -1,6 +1,6 @@
 #include "easy_cody.h"
 
-bool DebugMode = false;
+bool DebugMode = true;
 
 void Msg(const char *format, ...) {
     va_list args;
