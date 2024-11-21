@@ -264,11 +264,18 @@ void FreeFileList(str* FileList, size_t Count) {
 //Función de Ejemplo o Test
 
 void FilemanTest() {
-    if (DebugStatus) {
+    if (DebugStatus()) {
         // Probar la creación y apertura de un archivo
-        str dir = ".";
-        str name = "test.txt";
-        str mode = "w";
+        str dir = malloc(256);
+        strcpy(dir, ".");
+
+        str name = malloc(256);
+        strcpy(name, "test.txt");
+
+        str mode = malloc(256);
+        strcpy(mode, "w");
+
+
         FM file = OpenFile(dir, name, mode);
         if (file != NULL) {
             Msg("Fileman Test: Archivo abierto con éxito.");

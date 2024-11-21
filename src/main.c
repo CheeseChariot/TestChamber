@@ -6,6 +6,8 @@ int main() {
     Debug("Modo Depurador activado.");
     if(!DebugStatus())Msg("Modo Depurador apagado.");
 
+    FilemanTest();
+
     Msg("Cierre del programa.");
 
     End
