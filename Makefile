@@ -29,7 +29,7 @@ clean:
 
 dirs:
 	mkdir -p src obj incs build docs
-
+	touch src/.gitkeep obj/.gitkeep incs/.gitkeep build/.gitkeep docs/.gitkeep
 
 send:
 	tar czf $(GRUPO)-$(NTAR).tgz --transform 's,^,$(GRUPO)-$(NTAR)/,' Makefile src incs docs
