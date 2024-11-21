@@ -2,20 +2,21 @@
 
 FM OpenFile(str Dir, str Name, str Mode) {
     Debug("OpenFile: Intentando abrir archivo...");
-    Debug("OpenFile: D-> %s | A-> %s | M-> %s",Dir,Name,Mode);
+    Debug("OpenFile: D-> %s | A-> %s | M-> %s", Dir, Name, Mode);
     FM File = (FM) malloc(sizeof(struct FM));
     if (File == NULL) {
-        Debug("OpenFile: Error al asignar memoria para el archivo.");
+        Failure("OpenFile: Error al asignar memoria para el archivo.");
         return NULL;
     }
 
     char FilePath[256];
     snprintf(FilePath, sizeof(FilePath), "%s/%s", Dir, Name);
+    strcpy(File->Path, FilePath);
     Debug("OpenFile: Ruta completa del archivo generada.");
 
     File->FP = fopen(FilePath, Mode);
     if (File->FP == NULL) {
-        Debug("OpenFile: No se pudo abrir el archivo.");
+        Failure("OpenFile: No se pudo abrir el archivo.");
         free(File);
         return NULL;
     }
@@ -38,80 +39,217 @@ void CloseFile(FM File) {
     }
 }
 
-uint GetFileSize(FM File) {
-    Debug("GetFileSize: Calculando tamaño del archivo...");
-    if (File == NULL || File->FP == NULL) {
-        Debug("GetFileSize: Archivo no válido o no abierto.");
-        return 0;
-    }
-
-    long CurrentPos = ftell(File->FP);
-    fseek(File->FP, 0, SEEK_END);
-    long Size = ftell(File->FP);
-    fseek(File->FP, CurrentPos, SEEK_SET);
-    Debug("GetFileSize: Tamaño del archivo calculado: %lu bytes.", Size);
-
-    return (uint) Size;
-}
-
-bool FileExists(str Dir, str Name) {
-    Debug("FileExists: Comprobando si el archivo existe...");
-    FM Temp = OpenFile(Dir, Name, "r");
-    if (Temp && Temp->FP) {
-        CloseFile(Temp);
-        Debug("FileExists: Archivo encontrado.");
+bool ChangeDirectory(str Dir) {
+    Debug("ChangeDirectory: Intentando cambiar al directorio '%s'.", Dir);
+    if (chdir(Dir) == 0) {
+        Debug("ChangeDirectory: Directorio cambiado exitosamente a '%s'.", Dir);
         return true;
+    } else {
+        Debug("ChangeDirectory: No se pudo cambiar al directorio '%s'.", Dir);
+        return false;
     }
-    Debug("FileExists: Archivo no encontrado.");
-    return false;
 }
 
-bool FileTouch(str Dir, str Name) {
-    Debug("FileTouch: Intentando crear archivo vacío...");
-    FM Temp = OpenFile(Dir, Name, "a");
-    if (Temp && Temp->FP) {
-        CloseFile(Temp);
-        Debug("FileTouch: Archivo creado exitosamente.");
+char* GetCurrentDirectory() {
+    Debug("GetCurrentDirectory: Obteniendo el directorio actual...");
+    char* CurrentDir = malloc(256);
+    if (!CurrentDir) {
+        Failure("GetCurrentDirectory: No se pudo asignar memoria.");
+        return NULL;
+    }
+
+    if (getcwd(CurrentDir, 256) != NULL) {
+        Debug("GetCurrentDirectory: Directorio actual es '%s'.", CurrentDir);
+        return CurrentDir;
+    } else {
+        Failure("GetCurrentDirectory: No se pudo obtener el directorio actual.");
+        free(CurrentDir);
+        return NULL;
+    }
+}
+
+bool GoToParentDirectory() {
+    Debug("GoToParentDirectory: Intentando ir al directorio padre...");
+    if (ChangeDirectory("..")) {
+        Debug("GoToParentDirectory: Cambiado al directorio padre.");
         return true;
+    } else {
+        Debug("GoToParentDirectory: No se pudo cambiar al directorio padre.");
+        return false;
     }
-    Debug("FileTouch: No se pudo crear el archivo.");
-    return false;
 }
 
-size_t ReadFile(FM File, void* Buffer, size_t Size, size_t Count) {
-    Debug("ReadFile: Intentando leer archivo...");
-    if (File == NULL || File->FP == NULL) {
-        Debug("ReadFile: Archivo no válido o no abierto.");
-        return 0;
+bool GoToRootDirectory() {
+    Debug("GoToRootDirectory: Intentando ir al directorio raíz...");
+    if (ChangeDirectory("/")) {
+        Debug("GoToRootDirectory: Cambiado al directorio raíz.");
+        return true;
+    } else {
+        Debug("GoToRootDirectory: No se pudo cambiar al directorio raíz.");
+        return false;
     }
-    if (Buffer == NULL) {
-        Debug("ReadFile: Buffer de lectura es nulo.");
-        return 0;
-    }
-    if (strchr(File->Mode, 'r') == NULL && strchr(File->Mode, '+') == NULL) {
-        Debug("ReadFile: Archivo no está abierto en modo lectura.");
-        return 0;
-    }
-    size_t ReadCount = fread(Buffer, Size, Count, File->FP);
-    Debug("ReadFile: Se leyeron %zu bloques de tamaño %zu.", ReadCount, Size);
-    return ReadCount;
 }
 
-size_t WriteFile(FM File, const void* Buffer, size_t Size, size_t Count) {
-    Debug("WriteFile: Intentando escribir en archivo...");
+str* ListDirectory(str Dir, size_t* Count) {
+    Debug("ListDirectory: Listando archivos en el directorio '%s'.", Dir);
+    DIR* Directory = opendir(Dir);
+    if (!Directory) {
+        Failure("ListDirectory: No se pudo abrir el directorio '%s'.", Dir);
+        return NULL;
+    }
+
+    struct dirent* Entry;
+    size_t Capacity = 10;
+    *Count = 0;
+
+    str* FileList = malloc(Capacity * sizeof(char*));
+    if (!FileList) {
+        Failure("ListDirectory: No se pudo asignar memoria para la lista de archivos.");
+        closedir(Directory);
+        return NULL;
+    }
+
+    while ((Entry = readdir(Directory)) != NULL) {
+        if (*Count == Capacity) {
+            Capacity *= 2;
+            str* Temp = realloc(FileList, Capacity * sizeof(char*));
+            if (!Temp) {
+                Failure("ListDirectory: No se pudo redimensionar la lista de archivos.");
+                for (size_t i = 0; i < *Count; i++) free(FileList[i]);
+                free(FileList);
+                closedir(Directory);
+                return NULL;
+            }
+            FileList = Temp;
+        }
+
+        FileList[*Count] = strdup(Entry->d_name);
+        Debug("ListDirectory: Archivo encontrado: %s", Entry->d_name);
+        (*Count)++;
+    }
+
+    closedir(Directory);
+    Debug("ListDirectory: Se encontraron %zu archivos.", *Count);
+    return FileList;
+}
+
+str* ListCurrentDirectory(size_t* Count) {
+    Debug("ListCurrentDirectory: Listando archivos en el directorio actual...");
+    char* CurrentDir = GetCurrentDirectory();
+    if (!CurrentDir) {
+        Failure("ListCurrentDirectory: No se pudo obtener el directorio actual.");
+        return NULL;
+    }
+
+    str* FileList = ListDirectory(CurrentDir, Count);
+    free(CurrentDir);
+    return FileList;
+}
+
+void PrintFileContentWithWrap(FM File, size_t LineWidth) {
     if (File == NULL || File->FP == NULL) {
-        Debug("WriteFile: Archivo no válido o no abierto.");
-        return 0;
+        Failure("PrintFileContentWithWrap: Archivo no válido.");
+        return;
     }
-    if (Buffer == NULL) {
-        Debug("WriteFile: Buffer de escritura es nulo.");
-        return 0;
+
+    char buffer[1024];
+    size_t len = 0;
+    char* line = NULL;
+    size_t line_len = 0;
+
+    while (fgets(buffer, sizeof(buffer), File->FP)) {
+        size_t buffer_len = strlen(buffer);
+        size_t index = 0;
+
+        while (index < buffer_len) {
+            size_t next_space = index + LineWidth;
+            if (next_space > buffer_len) {
+                next_space = buffer_len;
+            }
+
+            while (next_space > index && buffer[next_space] != ' ' && next_space > index) {
+                next_space--;
+            }
+
+            if (next_space == index) {
+                next_space = index + LineWidth;
+            }
+
+            for (size_t i = index; i < next_space; i++) {
+                putchar(buffer[i]);
+            }
+            putchar('\n');
+
+            index = next_space + 1;
+        }
     }
-    if (strchr(File->Mode, 'w') == NULL && strchr(File->Mode, 'a') == NULL && strchr(File->Mode, '+') == NULL) {
-        Debug("WriteFile: Archivo no está abierto en modo escritura o anexado.");
-        return 0;
+}
+
+str CombinePath(str Dir, str Name) {
+    size_t len = strlen(Dir) + strlen(Name) + 2;
+    str Path = malloc(len);
+    if (Path == NULL) {
+        Failure("CombinePath: Error al asignar memoria para la ruta.");
+        return NULL;
     }
-    size_t WriteCount = fwrite(Buffer, Size, Count, File->FP);
-    Debug("WriteFile: Se escribieron %zu bloques de tamaño %zu.", WriteCount, Size);
-    return WriteCount;
+    snprintf(Path, len, "%s/%s", Dir, Name);
+    return Path;
+}
+
+void FreeFileList(str* FileList, size_t Count) {
+    for (size_t i = 0; i < Count; i++) {
+        free(FileList[i]);
+    }
+    free(FileList);
+}
+
+void FilemanExample() {
+    str tempDir = "/tmp";
+    size_t count;
+    
+    if (!ChangeDirectory(tempDir)) {
+        Debug("FilemanExample: No se pudo cambiar al directorio temporal.");
+        return;
+    }
+    
+    FM file = OpenFile(tempDir, "example.txt", "w");
+    if (file == NULL) {
+        Debug("FilemanExample: No se pudo abrir el archivo.");
+        return;
+    }
+
+    const char* content = "Este es un ejemplo de contenido para el archivo. "
+                          "Este texto debe ser mostrado correctamente en varias líneas "
+                          "dependiendo del ancho especificado para el salto de línea automático.";
+    WriteFile(file, content, 1, strlen(content));
+
+    CloseFile(file);
+
+    str* files = ListDirectory(tempDir, &count);
+    if (files == NULL) {
+        Debug("FilemanExample: No se pudo listar los archivos del directorio temporal.");
+        return;
+    }
+
+    Debug("FilemanExample: Archivos encontrados en %s:", tempDir);
+    for (size_t i = 0; i < count; i++) {
+        Debug("FilemanExample: %s", files[i]);
+        free(files[i]);
+    }
+    free(files);
+
+    if (!GoToParentDirectory()) {
+        Debug("FilemanExample: No se pudo volver al directorio anterior.");
+        return;
+    }
+
+    file = OpenFile(tempDir, "example.txt", "r");
+    if (file == NULL) {
+        Debug("FilemanExample: No se pudo volver a abrir el archivo.");
+        return;
+    }
+
+    Debug("FilemanExample: Mostrando contenido del archivo con salto de línea automático:");
+    PrintFileContentWithWrap(file, 40);
+    CloseFile(file);
 }
