@@ -27,7 +27,7 @@ clean:
 	rm -f $(OBJ_FILES)
 	rm -f build/$(EXEC)
 
-folders:
+dirs:
 	mkdir -p src obj incs build docs
 
 
