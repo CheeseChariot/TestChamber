@@ -1,0 +1,29 @@
+EASY_CODY MODULE DOCUMENTATION
+==============================
+
+Header File: easy_cody.h
+Source File: easy_cody.c
+
+Overview:
+Easy_Cody provides utility macros and functions for debugging, messaging, and arithmetic operations.
+
+Macros:
+1. Max(a, b): Returns the maximum of two values.
+2. Min(a, b): Returns the minimum of two values.
+3. Frac(a, b): Calculates the fraction (Decimal)(a)/(Decimal)(b).
+4. Loop: Infinite loop macro.
+5. Repeat(n): Repeats a block of code n times.
+
+Custom Types:
+- uint, ushort, uchar, ulong, ullong: Unsigned integer types.
+- str: Alias for char*.
+
+Functions:
+1. void Msg(const char* format, ...): Prints a formatted message.
+2. void Failure(const char* format, ...): Prints a fatal error message and aborts execution.
+3. void Debug(const char* format, ...): Prints a debug message if DebugMode is enabled.
+
+Debug Mode:
+Enable `DebugMode` to print debug messages. Example:
+DebugMode = true;
+Debug("This is a debug message.");

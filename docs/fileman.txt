@@ -1,0 +1,28 @@
+FILEMAN MODULE DOCUMENTATION
+============================
+
+Header File: fileman.h
+Source File: fileman.c
+
+Overview:
+Fileman provides utilities for file management, including opening, closing, and performing file operations.
+
+Structure:
+- typedef struct FM* FM: Represents a file manager.
+- struct FM:
+    - FILE* FP: Pointer to the file.
+    - char Mode[4]: Stores the mode of file operation ("r", "w", etc.).
+
+Functions:
+1. FM OpenFile(str Dir, str Name, str Mode): Opens a file with the given mode in the specified directory.
+2. void CloseFile(FM File): Closes the specified file.
+3. uint GetFileSize(FM File): Returns the size of the specified file.
+4. bool FileExists(str Dir, str Name): Checks if a file exists in the specified directory.
+5. bool FileTouch(str Dir, str Name): Creates an empty file if it does not exist.
+
+Usage Example:
+FM file = OpenFile("path/to/dir", "example.txt", "r");
+if (file) {
+    uint size = GetFileSize(file);
+    CloseFile(file);
+}
