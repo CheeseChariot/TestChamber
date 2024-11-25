@@ -19,6 +19,17 @@ Functions:
 3. uint GetFileSize(FM File): Returns the size of the specified file.
 4. bool FileExists(str Dir, str Name): Checks if a file exists in the specified directory.
 5. bool FileTouch(str Dir, str Name): Creates an empty file if it does not exist.
+6. size_t ReadFile(FM File, void* Buffer, size_t Size, size_t Count): Passes content to buffering.
+7. size_t WriteFile(FM File, const void* Buffer, size_t Size, size_t Count); Passes buffer to archive.
+8. bool ChangeDirectory(str Dir): Changes the directory.
+9. char* GetCurrentDirectory(): Gets the current directory string.
+10. bool GoToParentDirectory(): Changes the directory to the parent of current.
+11. bool GoToRootDirectory(): Changes the directory to the Root of the OS
+12. str* ListDirectory(str Dir, size_t* Count): Lists files and folders in a directory.
+13. str* ListCurrentDirectory(size_t* Count): Lists files and folders on the current directory.
+14. void PrintFileContentWithWrap(FM File, size_t LineWidth): Display content of a file with a defined width to search a space for a new line feed.
+
+
 
 Usage Example:
 FM file = OpenFile("path/to/dir", "example.txt", "r");
